@@ -1,0 +1,45 @@
+{
+  "name": "tomodoro-timer",
+  "displayName": "Tomodoro Timer",
+  "description": "50/10 timer for productive work",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "tomodoro.start",
+        "title": "Tomodoro: Start Timer",
+        "category": "Tomodoro"
+      },
+      {
+        "command": "tomodoro.pause",
+        "title": "Tomodoro: Pause Timer", 
+        "category": "Tomodoro"
+      },
+      {
+        "command": "tomodoro.reset",
+        "title": "Tomodoro: Reset Timer",
+        "category": "Tomodoro"
+      },
+      {
+        "command": "tomodoro.skip",
+        "title": "Tomodoro: Skip Phase",
+        "category": "Tomodoro"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "tomodoro.start",
+        "key": "ctrl+shift+t",
+        "mac": "cmd+shift+t"
+      }
+    ]
+  }
+}
