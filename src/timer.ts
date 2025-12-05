@@ -1,5 +1,9 @@
 import * as vscode from 'vscode';
 
+/**
+ * Класс TomodoroTimer - основной класс таймера Pomodoro.
+ * Реализует логику работы/перерыва, отображение в статус-баре и уведомления.
+ */
 export class TomodoroTimer implements vscode.Disposable {
     private statusBarItem: vscode.StatusBarItem;
     private timer: NodeJS.Timeout | undefined;
@@ -13,8 +17,12 @@ export class TomodoroTimer implements vscode.Disposable {
     private isWorkPhase: boolean = true;
     private currentSession: number = 0;
 
+    /**
+     * Конструктор класса TomodoroTimer.
+     * Инициализирует статус-бар и сбрасывает таймер к начальному состоянию.
+     */
     constructor() {
-        // Создаем статус бар
+        // Создаем элемент статус-бара с выравниванием справа
         this.statusBarItem = vscode.window.createStatusBarItem(
             vscode.StatusBarAlignment.Right,
             100
@@ -25,6 +33,11 @@ export class TomodoroTimer implements vscode.Disposable {
         this.reset();
     }
 
+    /**
+     * Запускает таймер, если он не был запущен.
+     * Создает интервал, который вызывает tick() каждую секунду.
+     * Показывает информационное сообщение о запуске.
+     */
     public start(): void {
         if (this.isRunning) {
             vscode.window.showInformationMessage('Timer is already running!');
@@ -41,6 +54,10 @@ export class TomodoroTimer implements vscode.Disposable {
         );
     }
 
+    /**
+     * Приостанавливает работу таймера.
+     * Останавливает интервал и показывает информационное сообщение.
+     */
     public pause(): void {
         if (!this.isRunning) {
             vscode.window.showInformationMessage('Timer is not running!');
@@ -56,6 +73,10 @@ export class TomodoroTimer implements vscode.Disposable {
         vscode.window.showInformationMessage('Timer paused');
     }
 
+    /**
+     * Сбрасывает таймер к начальным настройкам.
+     * Останавливает таймер, устанавливает рабочую фазу и начальное время.
+     */
     public reset(): void {
         this.pause();
         this.isWorkPhase = true;
@@ -65,11 +86,19 @@ export class TomodoroTimer implements vscode.Disposable {
         vscode.window.showInformationMessage('Timer reset to 50:00 work time');
     }
 
+    /**
+     * Пропускает текущую фазу (работа/перерыв) и переключает на следующую.
+     * Вызывает switchPhase() и показывает информационное сообщение.
+     */
     public skip(): void {
         this.switchPhase();
         vscode.window.showInformationMessage(`Switched to ${this.isWorkPhase ? 'work' : 'break'} phase`);
     }
 
+    /**
+     * Обработчик тика таймера (вызывается каждую секунду).
+     * Уменьшает оставшееся время и проверяет окончание текущей фазы.
+     */
     private tick(): void {
         this.timeLeft--;
 
@@ -80,6 +109,10 @@ export class TomodoroTimer implements vscode.Disposable {
         this.updateStatusBar();
     }
 
+    /**
+     * Переключает между рабочей фазой и перерывом.
+     * Останавливает таймер, меняет фазу, показывает уведомление с предложением начать следующую фазу.
+     */
     private switchPhase(): void {
         this.pause();
 
@@ -115,6 +148,11 @@ export class TomodoroTimer implements vscode.Disposable {
         this.updateStatusBar();
     }
 
+    /**
+     * Обновляет отображение таймера в статус-баре.
+     * Устанавливает текст, иконку, цвет и всплывающую подсказку.
+     * Назначает команду при клике (пауза/запуск).
+     */
     private updateStatusBar(): void {
         const icon = this.isWorkPhase ? '🎯' : '☕';
         const phase = this.isWorkPhase ? 'WORK' : 'BREAK';
@@ -131,12 +169,22 @@ export class TomodoroTimer implements vscode.Disposable {
         this.statusBarItem.command = this.isRunning ? 'tomodoro.pause' : 'tomodoro.start';
     }
 
+    /**
+     * Форматирует время из секунд в строку MM:SS.
+     * @param seconds - время в секундах
+     * @returns отформатированная строка времени
+     */
     private formatTime(seconds: number): string {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
         return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
 
+    /**
+     * Освобождает ресурсы, занятые таймером.
+     * Вызывается при деактивации расширения.
+     * Останавливает таймер и удаляет элемент статус-бара.
+     */
     public dispose(): void {
         this.pause();
         this.statusBarItem.dispose();
